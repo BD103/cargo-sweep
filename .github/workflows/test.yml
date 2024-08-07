@@ -1,0 +1,35 @@
+name: Test action
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Initialize Rust project
+        run: cargo init --bin
+
+      - name: Cache build files
+        uses: Leafwing-Studios/cargo-cache@v2      
+
+      - name: Build Rust project
+        run: cargo build
+
+      - name: cargo-sweep
+        uses: ./action.yml
+
+      - name: Check Rust project
+        run: cargo check
+
+      # `cargo-sweep` should delete all build files, but keep the check ones.
