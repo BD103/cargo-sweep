@@ -27,7 +27,7 @@ jobs:
         run: cargo build
 
       - name: cargo-sweep
-        uses: ./action.yml
+        uses: ./
 
       - name: Check Rust project
         run: cargo check
