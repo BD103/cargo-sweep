@@ -1,9 +1,12 @@
 name: Test action
 
 on:
+  # Runs when someone pushes to the main branch.
   push:
     branches: [main]
+  # Runs when someone updates a PR.
   pull_request:
+  # Allow running manually.
   workflow_dispatch:
 
 jobs:
