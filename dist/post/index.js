@@ -28062,6 +28062,7 @@ async function main() {
     await io.mv("target/cargo-sweep/sweep.timestamp", ".");
 
     // Remove everything older than timestamp.
+    core.info("Sweeping unused build files.");
     await exec.exec("cargo", ["sweep", "--file"]);
 }
 
