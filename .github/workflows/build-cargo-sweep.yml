@@ -1,0 +1,31 @@
+name: Build cargo-sweep
+
+on:
+  # Runs weekly on Sunday at midnight.
+  schedule:
+    - cron: 0 0 * * 0
+  # Allow running manually.
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build cargo-sweep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build cargo-sweep
+        # Keep version in sync with `main.js`.
+        # The compiled binary will be saved to `./bin/cargo-sweep`.
+        run: cargo install cargo-sweep --version ^0.7.0 --root . --no-track
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-sweep-linux
+          path: bin/cargo-sweep
+          if-no-files-found: error
+          # Artifact should be retained for 3 weeks. This workflow is run weekly, so even if it
+          # fails once, older versions will still be available.
+          retention-days: 21
