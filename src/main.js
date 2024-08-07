@@ -16,12 +16,17 @@ function downloadCargoSweep() {
  */
 async function main(usePrebuilt) {
     if (usePrebuilt) {
+        core.startGroup("Download pre-built `cargo-sweep`.");
         downloadCargoSweep();
+        core.endGroup();
     } else {
+        core.startGroup("Build `cargo-sweep` from scratch.");
         await buildCargoSweep();
+        core.endGroup();
     }
 
     // Create timestamp.
+    core.info("Creating timestamp.");
     await exec.exec("cargo", ["sweep", "--stamp"]);
 
     // Move timestamp to `target/cargo-sweep`.
