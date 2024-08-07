@@ -10,7 +10,19 @@ on:
 jobs:
   build:
     name: Build cargo-sweep
-    runs-on: ubuntu-latest
+    strategy:
+      # Do not stop if build fails for one OS.
+      fail-fast: false
+      # Run for all available runners.
+      matrix:
+        os:
+          - name: linux
+            runs-on: ubuntu-latest
+          - name: windows
+            runs-on: windows-latest
+          - name: macos
+            runs-on: macos-latest
+    runs-on: ${{ matrix.os.runs-on }}
     steps:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -23,7 +35,7 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: cargo-sweep-linux
+          name: cargo-sweep-${{ matrix.os.name }}
           path: bin/cargo-sweep
           if-no-files-found: error
           # Artifact should be retained for 3 weeks. This workflow is run weekly, so even if it
