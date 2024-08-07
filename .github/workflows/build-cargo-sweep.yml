@@ -18,10 +18,13 @@ jobs:
         os:
           - name: linux
             runs-on: ubuntu-latest
+            exe: cargo-sweep
           - name: windows
             runs-on: windows-latest
+            exe: cargo-sweep.exe
           - name: macos
             runs-on: macos-latest
+            exe: cargo-sweep
     runs-on: ${{ matrix.os.runs-on }}
     steps:
       - name: Install Rust
@@ -36,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cargo-sweep-${{ matrix.os.name }}
-          path: bin/cargo-sweep
+          path: bin/${{ matrix.os.exe }}
           if-no-files-found: error
           # Artifact should be retained for 3 weeks. This workflow is run weekly, so even if it
           # fails once, older versions will still be available.
