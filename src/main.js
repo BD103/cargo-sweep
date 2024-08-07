@@ -16,11 +16,11 @@ function downloadCargoSweep() {
  */
 async function main(usePrebuilt) {
     if (usePrebuilt) {
-        core.startGroup("Download pre-built `cargo-sweep`.");
+        core.startGroup("Downloading pre-built `cargo-sweep`.");
         downloadCargoSweep();
         core.endGroup();
     } else {
-        core.startGroup("Build `cargo-sweep` from scratch.");
+        core.startGroup("Building `cargo-sweep` from scratch.");
         await buildCargoSweep();
         core.endGroup();
     }
