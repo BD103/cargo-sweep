@@ -32,7 +32,7 @@ async function main(usePrebuilt) {
 try {
     const usePrebuilt = core.getBooleanInput("use-prebuilt", { required: false });
 
-    await main(usePrebuilt);
+    main(usePrebuilt);
 } catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
 }

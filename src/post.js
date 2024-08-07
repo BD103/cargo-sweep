@@ -11,7 +11,7 @@ async function main() {
 }
 
 try {
-    await main();
+    main();
 } catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
 }
