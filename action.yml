@@ -1,0 +1,17 @@
+name: cargo-sweep
+author: BD103
+description: Sweep away unused Cargo files from the `target` directory.
+inputs:
+  use-prebuilt:
+    description: |
+      If true, the action download a prebuilt binary of `cargo-sweep` instead of installing it
+      manually.
+    required: false
+    default: false
+runs:
+  using: node20
+  main: src/index.js
+  post: src/post.js
+branding:
+  icon: trash-2
+  color: orange
