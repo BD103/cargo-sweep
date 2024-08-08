@@ -1,14 +1,20 @@
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const io = require("@actions/io");
+const { writeFile } = require("fs/promises");
 
 async function main() {
-    // Move timestamp back to current directory.
-    await io.mv("target/cargo-sweep/sweep.timestamp", ".");
+    // Recreate `sweep.timestamp` file.
+    const timestamp = core.getState("timestamp");
+    await writeFile("sweep.timestamp", timestamp);
+    core.info(`Using timestamp: ${timestamp}.`);
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
-    await exec.exec("cargo", ["sweep", "--file"]);
+    await exec.exec('"target/cargo-sweep/bin/cargo-sweep"', ["sweep", "--file"]);
+
+    // Remove `cargo-sweep` folder so it is not cached.
+    await io.rmRF("target/cargo-sweep");
 }
 
 try {

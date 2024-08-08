@@ -26219,6 +26219,14 @@ module.exports = require("fs");
 
 /***/ }),
 
+/***/ 3292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
+
+/***/ }),
+
 /***/ 3685:
 /***/ ((module) => {
 
@@ -28056,14 +28064,20 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(9093);
 const exec = __nccwpck_require__(7775);
 const io = __nccwpck_require__(2826);
+const { writeFile } = __nccwpck_require__(3292);
 
 async function main() {
-    // Move timestamp back to current directory.
-    await io.mv("target/cargo-sweep/sweep.timestamp", ".");
+    // Recreate `sweep.timestamp` file.
+    const timestamp = core.getState("timestamp");
+    await writeFile("sweep.timestamp", timestamp);
+    core.info(`Using timestamp: ${timestamp}.`);
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
-    await exec.exec("cargo", ["sweep", "--file"]);
+    await exec.exec('"target/cargo-sweep/bin/cargo-sweep"', ["sweep", "--file"]);
+
+    // Remove `cargo-sweep` folder so it is not cached.
+    await io.rmRF("target/cargo-sweep");
 }
 
 try {

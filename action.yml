@@ -2,6 +2,10 @@ name: cargo-sweep
 author: BD103
 description: Sweep away unused Cargo files from the `target` directory.
 inputs:
+  gh-token:
+    description: TODO
+    required: false
+    default: ${{ github.token }}
   use-prebuilt:
     description: |
       If true, the action download a prebuilt binary of `cargo-sweep` instead of installing it
