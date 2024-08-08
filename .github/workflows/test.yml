@@ -12,7 +12,12 @@ on:
 jobs:
   test:
     name: Test action
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        prebuilt: [true, false]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,6 +36,8 @@ jobs:
 
       - name: cargo-sweep
         uses: ./
+        with:
+          use-prebuilt: ${{ matrix.prebuilt }}
 
       - name: Check Rust project
         run: cargo check
