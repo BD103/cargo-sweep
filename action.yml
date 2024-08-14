@@ -5,7 +5,7 @@ inputs:
   gh-token:
     description: |
       The Github token used to fetch the most recent artifact. This defaults to
-      `${{ github.token }}`, but is only required if `use-prebuilt` is true.
+      `github.token`, but is only required if `use-prebuilt` is true.
     required: false
     default: ${{ github.token }}
   use-prebuilt:
