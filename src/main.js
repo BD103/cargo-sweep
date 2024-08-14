@@ -76,10 +76,9 @@ async function downloadCargoSweep() {
     }
 }
 
-/**
- * @param {boolean} usePrebuilt 
- */
-async function main(usePrebuilt) {
+async function main() {
+    const usePrebuilt = core.getBooleanInput("use-prebuilt", { required: false });
+
     if (usePrebuilt) {
         core.startGroup("Downloading pre-built `cargo-sweep`.");
         await downloadCargoSweep();
@@ -101,9 +100,7 @@ async function main(usePrebuilt) {
 }
 
 try {
-    const usePrebuilt = core.getBooleanInput("use-prebuilt", { required: false });
-
-    main(usePrebuilt);
+    main();
 } catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
 }
