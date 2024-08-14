@@ -3,13 +3,15 @@ author: BD103
 description: Sweep away unused Cargo files from the `target` directory.
 inputs:
   gh-token:
-    description: TODO
+    description: |
+      The Github token used to fetch the most recent artifact. This defaults to
+      `${{ github.token }}`, but is only required if `use-prebuilt` is true.
     required: false
     default: ${{ github.token }}
   use-prebuilt:
     description: |
-      If true, the action download a prebuilt binary of `cargo-sweep` instead of installing it
-      manually.
+      If true, the action will download a prebuilt binary of `cargo-sweep` instead of installing it
+      using `cargo install`. By default this is false.
     required: false
     default: false
 runs:
