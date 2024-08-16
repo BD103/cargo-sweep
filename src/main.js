@@ -109,6 +109,8 @@ async function main() {
 
 try {
     main();
+    core.saveState("failed", "false");
 } catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
+    core.saveState("failed", "true");
 }

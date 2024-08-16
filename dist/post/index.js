@@ -28081,6 +28081,12 @@ async function main() {
 }
 
 try {
+    const failed = core.getState("failed");
+
+    if (failed == "true") {
+        throw new Error("Main action failed, not running post action.");
+    }
+
     main();
 } catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
