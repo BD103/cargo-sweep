@@ -20,13 +20,13 @@ jobs:
       # Run for all available runners.
       matrix:
         os:
-          - name: linux
+          - name: cargo-sweep-linux
             runs-on: ubuntu-latest
             exe: cargo-sweep
-          - name: windows
+          - name: cargo-sweep-windows
             runs-on: windows-latest
             exe: cargo-sweep.exe
-          - name: macos
+          - name: cargo-sweep-macos
             runs-on: macos-latest
             exe: cargo-sweep
     runs-on: ${{ matrix.os.runs-on }}
@@ -42,12 +42,13 @@ jobs:
       - name: Attest binary
         uses: actions/attest-build-provenance@v1
         with:
+          subject-name: ${{ matrix.os.name }}
           subject-path: bin/${{ matrix.os.exe }}
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: cargo-sweep-${{ matrix.os.name }}
+          name: ${{ matrix.os.name }}
           path: bin/${{ matrix.os.exe }}
           if-no-files-found: error
           # Artifact should be retained for 3 weeks. This workflow is run weekly, so even if it
