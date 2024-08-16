@@ -23,16 +23,20 @@ async function downloadCargoSweep() {
 
     // Find artifact name.
     let artifactName;
+    let artifactExe;
 
     switch (os.platform()) {
         case "linux":
             artifactName = "cargo-sweep-linux";
+            artifactExe = "cargo-sweep";
             break;
         case "win32":
             artifactName = "cargo-sweep-windows";
+            artifactExe = "cargo-sweep.exe";
             break;
         case "darwin":
             artifactName = "cargo-sweep-macos";
+            artifactExe = "cargo-sweep";
             break;
         default:
             throw new Error("Run on unsupported platform, prebuilt binaries are not supported.");
@@ -74,6 +78,8 @@ async function downloadCargoSweep() {
         case "darwin":
             await chmod("target/cargo-sweep/bin/cargo-sweep", 0o755);
     }
+
+    await exec.exec("gh", ["attestation", "verify", core.toPlatformPath(`target/cargo-sweep/bin/${artifactExe}`), "--repo", `${owner}/${repo}`]);
 }
 
 async function main() {
