@@ -7,6 +7,10 @@ on:
   # Allow running manually.
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  attestations: write
+
 jobs:
   build:
     name: Build cargo-sweep
@@ -34,6 +38,11 @@ jobs:
         # Keep version in sync with `main.js`.
         # The compiled binary will be saved to `./bin/cargo-sweep`.
         run: cargo install cargo-sweep --version ^0.7.0 --root . --no-track
+
+      - name: Attest binary
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: bin/${{ matrix.os.exe }}
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
