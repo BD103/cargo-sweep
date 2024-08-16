@@ -79,6 +79,8 @@ async function downloadCargoSweep() {
             await chmod("target/cargo-sweep/bin/cargo-sweep", 0o755);
     }
 
+    process.env["GH_TOKEN"] = ghToken;
+
     await exec.exec("gh", ["attestation", "verify", core.toPlatformPath(`target/cargo-sweep/bin/${artifactExe}`), "--repo", `${owner}/${repo}`]);
 }
 
