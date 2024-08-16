@@ -15,7 +15,7 @@ async function buildCargoSweep() {
 }
 
 async function downloadCargoSweep() {
-    const ghToken = core.getInput("gh-token", { required: false });
+    const ghToken = core.getInput("gh-token", { required: true });
     const octokit = github.getOctokit(ghToken);
 
     const owner = "BD103";
