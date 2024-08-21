@@ -28169,13 +28169,15 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(9093);
 const exec = __nccwpck_require__(7775);
 const io = __nccwpck_require__(2826);
-const { writeFile } = __nccwpck_require__(3292);
+
+const fs = __nccwpck_require__(3292);
+
 const shared = __nccwpck_require__(1590);
 
 async function main() {
     // Recreate `sweep.timestamp` file.
     const timestamp = core.getState("timestamp");
-    await writeFile("sweep.timestamp", timestamp);
+    await fs.writeFile("sweep.timestamp", timestamp);
     core.info(`Using timestamp: ${timestamp}.`);
 
     // Remove everything older than timestamp.

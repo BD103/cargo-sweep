@@ -1,13 +1,15 @@
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const io = require("@actions/io");
-const { writeFile } = require("fs/promises");
+
+const fs = require("fs/promises");
+
 const shared = require("./index");
 
 async function main() {
     // Recreate `sweep.timestamp` file.
     const timestamp = core.getState("timestamp");
-    await writeFile("sweep.timestamp", timestamp);
+    await fs.writeFile("sweep.timestamp", timestamp);
     core.info(`Using timestamp: ${timestamp}.`);
 
     // Remove everything older than timestamp.

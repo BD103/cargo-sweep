@@ -3,8 +3,10 @@ const core = require("@actions/core");
 const exec = require("@actions/exec");
 const github = require("@actions/github");
 const io = require("@actions/io");
+
 const os = require("os");
-const { readFile, chmod } = require("fs/promises");
+const fs = require("fs/promises");
+
 const shared = require("./index");
 
 async function buildCargoSweep() {
@@ -47,7 +49,7 @@ async function downloadCargoSweep() {
     switch (os.platform()) {
         case "linux":
         case "darwin":
-            await chmod(shared.PATH, 0o755);
+            await fs.chmod(shared.PATH, 0o755);
     }
 
     process.env["GH_TOKEN"] = ghToken;
@@ -73,7 +75,7 @@ async function main() {
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--stamp"]);
 
     // Save contents of `sweep.timestamp` to state, removing the original file.
-    const timestamp = (await readFile("sweep.timestamp")).toString();
+    const timestamp = (await fs.readFile("sweep.timestamp")).toString();
     core.saveState("timestamp", timestamp);
     await io.rmRF("sweep.timestamp");
 }
