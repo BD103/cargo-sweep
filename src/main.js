@@ -9,7 +9,7 @@ const shared = require("./index");
 
 async function buildCargoSweep() {
     // Force install `cargo-sweep`, opting-in to SemVer-compatible updates from 0.7 upwards.
-    await exec.exec("cargo", ["install", "cargo-sweep", "--version", shared.VERSION, "--no-track", "--force"]);
+    await exec.exec("cargo", ["install", "cargo-sweep", `--version ${shared.VERSION}`, "--no-track", "--force"]);
 }
 
 async function downloadCargoSweep() {
@@ -52,7 +52,7 @@ async function downloadCargoSweep() {
 
     process.env["GH_TOKEN"] = ghToken;
 
-    await exec.exec("gh", ["attestation", "verify", shared.PATH, "--repo", `${shared.REPO.owner}/${shared.REPO.repo}`]);
+    await exec.exec("gh", ["attestation", "verify", shared.PATH, `--repo ${shared.REPO.owner}/${shared.REPO.repo}`]);
 }
 
 async function main() {
