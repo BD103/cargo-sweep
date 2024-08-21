@@ -61370,13 +61370,13 @@ exports["default"] = _default;
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   "ACTION_VERSION": () => (/* binding */ ACTION_VERSION),
-/* harmony export */   "CACHE_KEY": () => (/* binding */ CACHE_KEY),
 /* harmony export */   "CARGO_SWEEP_VERSION": () => (/* binding */ CARGO_SWEEP_VERSION),
 /* harmony export */   "PARENT_PATH": () => (/* binding */ PARENT_PATH),
 /* harmony export */   "PATH": () => (/* binding */ PATH),
 /* harmony export */   "REPO": () => (/* binding */ REPO),
 /* harmony export */   "artifactExe": () => (/* binding */ artifactExe),
-/* harmony export */   "artifactName": () => (/* binding */ artifactName)
+/* harmony export */   "artifactName": () => (/* binding */ artifactName),
+/* harmony export */   "cacheKey": () => (/* binding */ cacheKey)
 /* harmony export */ });
 const path = __nccwpck_require__(1017);
 const os = __nccwpck_require__(2037);
@@ -61416,7 +61416,9 @@ const PATH = path.join(PARENT_PATH, artifactExe());
 /**
  * The primary key to use with the cache.
  */
-const CACHE_KEY = `cargo-sweep-${ACTION_VERSION}-${CARGO_SWEEP_VERSION}`;
+function cacheKey() {
+    return `cargo-sweep-${ACTION_VERSION}-${CARGO_SWEEP_VERSION}-${os.platform()}`;
+}
 
 /**
  * @returns {string} The name of the artifact to download, depending on the current OS.
@@ -72431,7 +72433,7 @@ async function main() {
     if (useCache && cacheHit === "false") {
         cache.saveCache(
             [shared.PATH],
-            shared.CACHE_KEY,
+            shared.cacheKey(),
         )
     }
 

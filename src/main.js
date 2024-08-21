@@ -73,7 +73,7 @@ async function main() {
         core.startGroup("Restoring `cargo-sweep` from cache.");
         cacheSuccess = await cache.restoreCache(
             [shared.PATH],
-            shared.CACHE_KEY,
+            shared.cacheKey(),
         );
         core.endGroup();
     }

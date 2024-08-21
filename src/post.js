@@ -25,7 +25,7 @@ async function main() {
     if (useCache && cacheHit === "false") {
         cache.saveCache(
             [shared.PATH],
-            shared.CACHE_KEY,
+            shared.cacheKey(),
         )
     }
 
