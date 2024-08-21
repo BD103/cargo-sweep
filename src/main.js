@@ -3,48 +3,24 @@ const core = require("@actions/core");
 const exec = require("@actions/exec");
 const github = require("@actions/github");
 const io = require("@actions/io");
-const os = require("os");
 const { readFile, chmod } = require("fs/promises");
+const shared = require("./index");
 
 async function buildCargoSweep() {
     // Force install `cargo-sweep`, opting-in to SemVer-compatible updates from 0.7 upwards.
-    await exec.exec("cargo", ["install", "cargo-sweep", "--version", "^0.7.0", "--no-track", "--force"]);
+    await exec.exec("cargo", ["install", "cargo-sweep", "--version", shared.VERSION, "--no-track", "--force"]);
 }
 
 async function downloadCargoSweep() {
     const ghToken = core.getInput("gh-token", { required: true });
     const octokit = github.getOctokit(ghToken);
 
-    const owner = "BD103";
-    const repo = "cargo-sweep";
-
-    // Find artifact name.
-    let artifactName;
-    let artifactExe;
-
-    switch (os.platform()) {
-        case "linux":
-            artifactName = "cargo-sweep-linux";
-            artifactExe = "cargo-sweep";
-            break;
-        case "win32":
-            artifactName = "cargo-sweep-windows";
-            artifactExe = "cargo-sweep.exe";
-            break;
-        case "darwin":
-            artifactName = "cargo-sweep-macos";
-            artifactExe = "cargo-sweep";
-            break;
-        default:
-            throw new Error("Run on unsupported platform, prebuilt binaries are not supported.");
-    }
-
     // Find the latest artifact for the given name.
     let { data } = await octokit.rest.actions.listArtifactsForRepo({
-        owner,
-        repo,
+        owner: shared.REPO.owner,
+        repo: shared.REPO.repo,
         per_page: 1,
-        name: artifactName,
+        name: shared.artifactName(),
     });
 
     if (data.artifacts.length < 1 || data.artifacts[0].expired) {
@@ -57,7 +33,7 @@ async function downloadCargoSweep() {
     // Download artifact.
     const client = new artifact.DefaultArtifactClient();
     await client.downloadArtifact(artifactId, {
-        path: "~/.cargo/bin",
+        path: shared.PARENT_PATH,
         findBy: {
             token: ghToken,
             workflowRunId,
@@ -67,15 +43,15 @@ async function downloadCargoSweep() {
     });
 
     // Make binary executable on Unix.
-    switch (os.platform()) {
+    switch (shared.PLATFORM) {
         case "linux":
         case "darwin":
-            await chmod("~/.cargo/bin/cargo-sweep", 0o755);
+            await chmod(shared.PATH, 0o755);
     }
 
     process.env["GH_TOKEN"] = ghToken;
 
-    await exec.exec("gh", ["attestation", "verify", core.toPlatformPath(`~/.cargo/bin/${artifactExe}`), "--repo", `${owner}/${repo}`]);
+    await exec.exec("gh", ["attestation", "verify", shared.PATH, "--repo", `${owner}/${repo}`]);
 }
 
 async function main() {
@@ -93,7 +69,7 @@ async function main() {
 
     // Create timestamp.
     core.info("Creating timestamp.");
-    await exec.exec('"~/.cargo/bin/cargo-sweep"', ["sweep", "--stamp"]);
+    await exec.exec(`"${shared.PATH}"`, ["sweep", "--stamp"]);
 
     // Save contents of `sweep.timestamp` to state, removing the original file.
     const timestamp = (await readFile("sweep.timestamp")).toString();

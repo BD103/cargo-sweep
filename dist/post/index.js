@@ -26147,6 +26147,89 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 1590:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "PARENT_PATH": () => (/* binding */ PARENT_PATH),
+/* harmony export */   "PATH": () => (/* binding */ PATH),
+/* harmony export */   "PLATFORM": () => (/* binding */ PLATFORM),
+/* harmony export */   "REPO": () => (/* binding */ REPO),
+/* harmony export */   "VERSION": () => (/* binding */ VERSION),
+/* harmony export */   "artifactExe": () => (/* binding */ artifactExe),
+/* harmony export */   "artifactName": () => (/* binding */ artifactName)
+/* harmony export */ });
+const path = __nccwpck_require__(1017);
+const os = __nccwpck_require__(2037);
+
+/**
+ * The version requirement passed to `cargo install` when installing `cargo-sweep`.
+ */
+const VERSION = "^7.0.0";
+
+/**
+ * The repository to download prebuilt `cargo-sweep` artifacts from.
+ */
+const REPO = {
+    owner: "BD103",
+    repo: "cargo-sweep",
+};
+
+/**
+ * The path to the parent folder of the installed `cargo-sweep`.
+ * 
+ * This is usually `~/.cargo/bin`.
+ */
+const PARENT_PATH = path.join(os.homedir(), ".cargo", "bin");
+
+/**
+ * The path to the installed `cargo-sweep`.
+ * 
+ * This is usually `~/.cargo/bin/cargo-sweep`.
+ */
+const PATH = path.join(PARENT_PATH, artifactExe());
+
+/**
+ * The result of `os.platform()`.
+ */
+const PLATFORM = os.platform()
+
+/**
+ * @returns {string} The name of the artifact to download, depending on the current OS.
+ */
+function artifactName() {
+    switch (PLATFORM) {
+        case "linux":
+            return "cargo-sweep-linux";
+        case "win32":
+            return "cargo-sweep-windows";
+        case "darwin":
+            return "cargo-sweep-macos";
+        default:
+            throw new Error("Run on unsupported platform, artifact name is not available.");
+    }
+}
+
+/**
+ * @returns {string} The executable name of the artifact to download, depending on the current OS.
+ */
+function artifactExe() {
+    switch (PLATFORM) {
+        case "linux":
+        case "darwin":
+            return "cargo-sweep";
+        case "win32":
+            return "cargo-sweep.exe";
+        default:
+            throw new Error("Run on unsupported platform, artifact exe is not available.");
+    }
+}
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -28053,6 +28136,34 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -28065,6 +28176,7 @@ const core = __nccwpck_require__(9093);
 const exec = __nccwpck_require__(7775);
 const io = __nccwpck_require__(2826);
 const { writeFile } = __nccwpck_require__(3292);
+const shared = __nccwpck_require__(1590);
 
 async function main() {
     // Recreate `sweep.timestamp` file.
@@ -28074,10 +28186,10 @@ async function main() {
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
-    await exec.exec('"~/.cargo/bin/cargo-sweep"', ["sweep", "--file"]);
+    await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
 
     // Remove `cargo-sweep` folder so it is not cached.
-    await io.rmRF("~/.cargo/bin/cargo-sweep");
+    await io.rmRF(shared.PATH);
 }
 
 try {
