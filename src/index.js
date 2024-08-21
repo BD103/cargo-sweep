@@ -2,6 +2,11 @@ const path = require("path");
 const os = require("os");
 
 /**
+ * The version of this action, must be kept in sync with releases.
+ */
+export const ACTION_VERSION = "1.3.0";
+
+/**
  * The version requirement passed to `cargo install` when installing `cargo-sweep`.
  */
 export const CARGO_SWEEP_VERSION = "^0.7.0";
@@ -27,6 +32,11 @@ export const PARENT_PATH = path.join(os.homedir(), ".cargo", "bin");
  * This is usually `~/.cargo/bin/cargo-sweep`.
  */
 export const PATH = path.join(PARENT_PATH, artifactExe());
+
+/**
+ * The primary key to use with the cache.
+ */
+export const CACHE_KEY = `cargo-sweep-${ACTION_VERSION}-${CARGO_SWEEP_VERSION}`;
 
 /**
  * @returns {string} The name of the artifact to download, depending on the current OS.

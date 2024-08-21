@@ -1,4 +1,5 @@
 const artifact = require("@actions/artifact");
+const cache = require("@actions/cache");
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const github = require("@actions/github");
@@ -63,17 +64,36 @@ async function downloadCargoSweep() {
 }
 
 async function main() {
+    const useCache = core.getBooleanInput("use-cache", { required: false });
     const usePrebuilt = core.getBooleanInput("use-prebuilt", { required: false });
 
-    if (usePrebuilt) {
-        core.startGroup("Downloading pre-built `cargo-sweep`.");
-        await downloadCargoSweep();
-    } else {
-        core.startGroup("Building `cargo-sweep` from scratch.");
-        await buildCargoSweep();
+    let cacheSuccess = undefined;
+
+    if (useCache) {
+        core.startGroup("Restoring `cargo-sweep` from cache.");
+        cacheSuccess = await cache.restoreCache(
+            [shared.PATH],
+            shared.CACHE_KEY,
+        );
+        core.endGroup();
     }
 
-    core.endGroup();
+    // If no cache was found or caching is disabled.
+    if (cacheSuccess === undefined) {
+        core.saveState("cache-hit", "false");
+
+        if (usePrebuilt) {
+            core.startGroup("Downloading pre-built `cargo-sweep`.");
+            await downloadCargoSweep();
+        } else {
+            core.startGroup("Building `cargo-sweep` from scratch.");
+            await buildCargoSweep();
+        }
+
+        core.endGroup();
+    } else {
+        core.saveState("cache-hit", "true");
+    }
 
     // Create timestamp.
     core.info("Creating timestamp.");

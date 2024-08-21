@@ -1,3 +1,4 @@
+const cache = require("@actions/cache");
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const io = require("@actions/io");
@@ -7,6 +8,9 @@ const fs = require("fs/promises");
 const shared = require("./index");
 
 async function main() {    
+    const useCache = core.getBooleanInput("use-cache", { required: false });
+    const cacheHit = core.getState("cache-hit");
+
     // Recreate `sweep.timestamp` file.
     core.info("Restoring timestamp from state.");
     const timestamp = core.getState("timestamp");
@@ -17,8 +21,15 @@ async function main() {
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
-    
-    // Remove `cargo-sweep` file so it is not cached.
+
+    if (useCache && cacheHit === "false") {
+        cache.saveCache(
+            [shared.PATH],
+            shared.CACHE_KEY,
+        )
+    }
+
+    // Remove `cargo-sweep` file so it is not cached by anything else.
     core.info("Removing `cargo-sweep`.");
     await io.rmRF(shared.PATH);
 }

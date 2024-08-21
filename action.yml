@@ -14,6 +14,13 @@ inputs:
       using `cargo install`. By default this is false.
     required: false
     default: false
+  use-cache:
+    description: |
+      If true, the action will save `cargo-sweep` to the Github Actions cache and restore it
+      instead of compiling / downloading it again. This can greatly speed up this action when
+      `use-prebuilt` is false, but has little effect when it is true. By default this is true.
+    required: false
+    default: true
 runs:
   using: node20
   main: dist/main/index.js
