@@ -11,7 +11,7 @@ const shared = require("./index");
 
 async function buildCargoSweep() {
     // Force install `cargo-sweep`, opting-in to SemVer-compatible updates from 0.7 upwards.
-    await exec.exec("cargo", ["install", "cargo-sweep", "--version", shared.VERSION, "--no-track", "--force"]);
+    await exec.exec("cargo", ["install", "cargo-sweep", "--version", shared.CARGO_SWEEP_VERSION, "--no-track", "--force"]);
 }
 
 async function downloadCargoSweep() {
