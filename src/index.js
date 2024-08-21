@@ -29,15 +29,10 @@ export const PARENT_PATH = path.join(os.homedir(), ".cargo", "bin");
 export const PATH = path.join(PARENT_PATH, artifactExe());
 
 /**
- * The result of `os.platform()`.
- */
-export const PLATFORM = os.platform()
-
-/**
  * @returns {string} The name of the artifact to download, depending on the current OS.
  */
 export function artifactName() {
-    switch (PLATFORM) {
+    switch (os.platform()) {
         case "linux":
             return "cargo-sweep-linux";
         case "win32":
@@ -53,7 +48,7 @@ export function artifactName() {
  * @returns {string} The executable name of the artifact to download, depending on the current OS.
  */
 export function artifactExe() {
-    switch (PLATFORM) {
+    switch (os.platform()) {
         case "linux":
         case "darwin":
             return "cargo-sweep";

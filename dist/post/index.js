@@ -26155,7 +26155,6 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   "PARENT_PATH": () => (/* binding */ PARENT_PATH),
 /* harmony export */   "PATH": () => (/* binding */ PATH),
-/* harmony export */   "PLATFORM": () => (/* binding */ PLATFORM),
 /* harmony export */   "REPO": () => (/* binding */ REPO),
 /* harmony export */   "VERSION": () => (/* binding */ VERSION),
 /* harmony export */   "artifactExe": () => (/* binding */ artifactExe),
@@ -26192,15 +26191,10 @@ const PARENT_PATH = path.join(os.homedir(), ".cargo", "bin");
 const PATH = path.join(PARENT_PATH, artifactExe());
 
 /**
- * The result of `os.platform()`.
- */
-const PLATFORM = os.platform()
-
-/**
  * @returns {string} The name of the artifact to download, depending on the current OS.
  */
 function artifactName() {
-    switch (PLATFORM) {
+    switch (os.platform()) {
         case "linux":
             return "cargo-sweep-linux";
         case "win32":
@@ -26216,7 +26210,7 @@ function artifactName() {
  * @returns {string} The executable name of the artifact to download, depending on the current OS.
  */
 function artifactExe() {
-    switch (PLATFORM) {
+    switch (os.platform()) {
         case "linux":
         case "darwin":
             return "cargo-sweep";

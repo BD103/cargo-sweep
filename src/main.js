@@ -3,6 +3,7 @@ const core = require("@actions/core");
 const exec = require("@actions/exec");
 const github = require("@actions/github");
 const io = require("@actions/io");
+const os = require("os");
 const { readFile, chmod } = require("fs/promises");
 const shared = require("./index");
 
@@ -43,7 +44,7 @@ async function downloadCargoSweep() {
     });
 
     // Make binary executable on Unix.
-    switch (shared.PLATFORM) {
+    switch (os.platform()) {
         case "linux":
         case "darwin":
             await chmod(shared.PATH, 0o755);
