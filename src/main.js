@@ -7,11 +7,8 @@ const os = require("os");
 const { readFile, chmod } = require("fs/promises");
 
 async function buildCargoSweep() {
-    // Create destination directory.
-    await io.mkdirP("target/cargo-sweep/bin");
-
     // Force install `cargo-sweep`, opting-in to SemVer-compatible updates from 0.7 upwards.
-    await exec.exec("cargo", ["install", "cargo-sweep", "--version", "^0.7.0", "--root", "target/cargo-sweep", "--no-track", "--force"]);
+    await exec.exec("cargo", ["install", "cargo-sweep", "--version", "^0.7.0", "--no-track", "--force"]);
 }
 
 async function downloadCargoSweep() {
@@ -57,13 +54,10 @@ async function downloadCargoSweep() {
     const artifactId = data.artifacts[0].id;
     const workflowRunId = data.artifacts[0].workflow_run.id;
 
-    // Create destination directory.
-    await io.mkdirP("target/cargo-sweep/bin");
-
     // Download artifact.
     const client = new artifact.DefaultArtifactClient();
     await client.downloadArtifact(artifactId, {
-        path: "target/cargo-sweep/bin",
+        path: "~/.cargo/bin",
         findBy: {
             token: ghToken,
             workflowRunId,
@@ -76,12 +70,12 @@ async function downloadCargoSweep() {
     switch (os.platform()) {
         case "linux":
         case "darwin":
-            await chmod("target/cargo-sweep/bin/cargo-sweep", 0o755);
+            await chmod("~/.cargo/bin/cargo-sweep", 0o755);
     }
 
     process.env["GH_TOKEN"] = ghToken;
 
-    await exec.exec("gh", ["attestation", "verify", core.toPlatformPath(`target/cargo-sweep/bin/${artifactExe}`), "--repo", `${owner}/${repo}`]);
+    await exec.exec("gh", ["attestation", "verify", core.toPlatformPath(`~/.cargo/bin/${artifactExe}`), "--repo", `${owner}/${repo}`]);
 }
 
 async function main() {
@@ -99,7 +93,7 @@ async function main() {
 
     // Create timestamp.
     core.info("Creating timestamp.");
-    await exec.exec('"target/cargo-sweep/bin/cargo-sweep"', ["sweep", "--stamp"]);
+    await exec.exec("cargo-sweep", ["sweep", "--stamp"]);
 
     // Save contents of `sweep.timestamp` to state, removing the original file.
     const timestamp = (await readFile("sweep.timestamp")).toString();

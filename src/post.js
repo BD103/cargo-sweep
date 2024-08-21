@@ -11,10 +11,10 @@ async function main() {
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
-    await exec.exec('"target/cargo-sweep/bin/cargo-sweep"', ["sweep", "--file"]);
+    await exec.exec("cargo-sweep", ["sweep", "--file"]);
 
     // Remove `cargo-sweep` folder so it is not cached.
-    await io.rmRF("target/cargo-sweep");
+    await io.rmRF("~/.cargo/bin/cargo-sweep");
 }
 
 try {
