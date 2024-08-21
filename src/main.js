@@ -93,7 +93,7 @@ async function main() {
 
     // Create timestamp.
     core.info("Creating timestamp.");
-    await exec.exec("cargo-sweep", ["sweep", "--stamp"]);
+    await exec.exec('"~/.cargo/bin/cargo-sweep"', ["sweep", "--stamp"]);
 
     // Save contents of `sweep.timestamp` to state, removing the original file.
     const timestamp = (await readFile("sweep.timestamp")).toString();
