@@ -38,8 +38,8 @@ async function downloadCargoSweep() {
         findBy: {
             token: ghToken,
             workflowRunId,
-            repositoryOwner: owner,
-            repositoryName: repo,
+            repositoryOwner: shared.REPO.owner,
+            repositoryName: shared.REPO.repo,
         },
     });
 
