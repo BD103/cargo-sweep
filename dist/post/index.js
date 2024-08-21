@@ -26166,7 +26166,7 @@ const os = __nccwpck_require__(2037);
 /**
  * The version requirement passed to `cargo install` when installing `cargo-sweep`.
  */
-const VERSION = "^7.0.0";
+const VERSION = "^0.7.0";
 
 /**
  * The repository to download prebuilt `cargo-sweep` artifacts from.

@@ -4,7 +4,7 @@ const os = require("os");
 /**
  * The version requirement passed to `cargo install` when installing `cargo-sweep`.
  */
-export const VERSION = "^7.0.0";
+export const VERSION = "^0.7.0";
 
 /**
  * The repository to download prebuilt `cargo-sweep` artifacts from.
