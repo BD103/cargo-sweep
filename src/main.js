@@ -19,6 +19,7 @@ async function downloadCargoSweep() {
     const octokit = github.getOctokit(ghToken);
 
     // Find the latest artifact for the given name.
+    core.info("Fetching latest artifact.");
     let { data } = await octokit.rest.actions.listArtifactsForRepo({
         owner: shared.REPO.owner,
         repo: shared.REPO.repo,
@@ -33,7 +34,9 @@ async function downloadCargoSweep() {
     const artifactId = data.artifacts[0].id;
     const workflowRunId = data.artifacts[0].workflow_run.id;
 
+    
     // Download artifact.
+    core.info(`Downloading artifact ${artifactId} from workflow run ${workflowRunId} to ${shared.PARENT_PATH}`);
     const client = new artifact.DefaultArtifactClient();
     await client.downloadArtifact(artifactId, {
         path: shared.PARENT_PATH,
@@ -49,13 +52,13 @@ async function downloadCargoSweep() {
     switch (os.platform()) {
         case "linux":
         case "darwin":
+            core.info("Making binary executable on Unix.");
             await fs.chmod(shared.PATH, 0o755);
     }
-
+    
+    core.info("Verifying binary integrity using artifact attestations.");
     process.env["GH_TOKEN"] = ghToken;
-
     await exec.exec("gh", ["attestation", "verify", shared.PATH, `--repo ${shared.REPO.owner}/${shared.REPO.repo}`]);
-
     delete process.env["GH_TOKEN"];
 }
 
@@ -77,6 +80,7 @@ async function main() {
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--stamp"]);
 
     // Save contents of `sweep.timestamp` to state, removing the original file.
+    core.info("Reading timestamp into state and deleting original.");
     const timestamp = (await fs.readFile("sweep.timestamp")).toString();
     core.saveState("timestamp", timestamp);
     await io.rmRF("sweep.timestamp");
