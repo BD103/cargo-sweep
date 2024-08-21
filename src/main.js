@@ -52,7 +52,7 @@ async function downloadCargoSweep() {
 
     process.env["GH_TOKEN"] = ghToken;
 
-    await exec.exec("gh", ["attestation", "verify", shared.PATH, "--repo", `${owner}/${repo}`]);
+    await exec.exec("gh", ["attestation", "verify", shared.PATH, "--repo", `${shared.REPO.owner}/${shared.REPO.repo}`]);
 }
 
 async function main() {
