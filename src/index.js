@@ -47,7 +47,9 @@ export const PATH = path.join(PARENT_PATH, artifactExe());
 /**
  * The primary key to use with the cache.
  */
-const CACHE_KEY = `cargo-sweep-${ACTION_VERSION}-${CARGO_SWEEP_VERSION}-${os.platform()}-prebuilt-${INPUTS.usePrebuilt}`;
+export function cacheKey() {
+    return `cargo-sweep-${ACTION_VERSION}-${CARGO_SWEEP_VERSION}-${os.platform()}-prebuilt-${INPUTS.usePrebuilt}`;
+}
 
 /**
  * @returns {string} The name of the artifact to download, depending on the current OS.

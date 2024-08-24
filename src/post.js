@@ -22,11 +22,11 @@ async function main() {
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
 
     if (shared.INPUTS.useCache && cacheHit === "false") {
-        core.info(`Saving cache with key ${shared.CACHE_KEY}`);
+        core.info(`Saving cache with key ${shared.cacheKey()}`);
 
         cache.saveCache(
             [shared.PATH],
-            shared.CACHE_KEY,
+            shared.cacheKey(),
         )
     }
 }
