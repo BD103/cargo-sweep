@@ -16,7 +16,13 @@ async function buildCargoSweep() {
 }
 
 async function downloadCargoSweep() {
-    const ghToken = core.getInput("gh-token", { required: true });
+    const ghToken = shared.INPUTS.ghToken;
+
+    // `ghToken` is only required if `use-prebuilt: true`.
+    if (ghToken === "") {
+        throw new Error("Attempted to download prebuilt `cargo-sweep` without `gh-token` specified.");
+    }
+
     const octokit = github.getOctokit(ghToken);
 
     // Find the latest artifact for the given name.
@@ -63,12 +69,9 @@ async function downloadCargoSweep() {
 }
 
 async function main() {
-    const useCache = core.getBooleanInput("use-cache", { required: false });
-    const usePrebuilt = core.getBooleanInput("use-prebuilt", { required: false });
-
     let cacheSuccess = undefined;
 
-    if (useCache) {
+    if (shared.INPUTS.useCache) {
         core.startGroup("Restoring `cargo-sweep` from cache.");
 
         cacheSuccess = await cache.restoreCache(
@@ -89,7 +92,7 @@ async function main() {
 
     // If no cache was found or caching is disabled.
     if (cacheSuccess === undefined) {
-        if (usePrebuilt) {
+        if (shared.INPUTS.usePrebuilt) {
             core.startGroup("Downloading pre-built `cargo-sweep`.");
             await downloadCargoSweep();
         } else {

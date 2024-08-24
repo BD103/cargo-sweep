@@ -1,3 +1,5 @@
+const core = require("@actions/core");
+
 const path = require("path");
 const os = require("os");
 
@@ -10,6 +12,15 @@ export const ACTION_VERSION = "1.3.0";
  * The version requirement passed to `cargo install` when installing `cargo-sweep`.
  */
 export const CARGO_SWEEP_VERSION = "^0.7.0";
+
+/**
+ * The values of the inputs specified in `action.yml`.
+ */
+export const INPUTS = {
+    ghToken: core.getInput("gh-token", { required: false }),
+    usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
+    useCache: core.getBooleanInput("use-cache", { required: true }),
+};
 
 /**
  * The repository to download prebuilt `cargo-sweep` artifacts from.

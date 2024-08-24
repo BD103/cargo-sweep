@@ -61389,6 +61389,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   "ACTION_VERSION": () => (/* binding */ ACTION_VERSION),
 /* harmony export */   "CARGO_SWEEP_VERSION": () => (/* binding */ CARGO_SWEEP_VERSION),
+/* harmony export */   "INPUTS": () => (/* binding */ INPUTS),
 /* harmony export */   "PARENT_PATH": () => (/* binding */ PARENT_PATH),
 /* harmony export */   "PATH": () => (/* binding */ PATH),
 /* harmony export */   "REPO": () => (/* binding */ REPO),
@@ -61396,6 +61397,8 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */   "artifactName": () => (/* binding */ artifactName),
 /* harmony export */   "cacheKey": () => (/* binding */ cacheKey)
 /* harmony export */ });
+const core = __nccwpck_require__(9093);
+
 const path = __nccwpck_require__(1017);
 const os = __nccwpck_require__(2037);
 
@@ -61408,6 +61411,15 @@ const ACTION_VERSION = "1.3.0";
  * The version requirement passed to `cargo install` when installing `cargo-sweep`.
  */
 const CARGO_SWEEP_VERSION = "^0.7.0";
+
+/**
+ * The values of the inputs specified in `action.yml`.
+ */
+const INPUTS = {
+    ghToken: core.getInput("gh-token", { required: false }),
+    usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
+    useCache: core.getBooleanInput("use-cache", { required: true }),
+};
 
 /**
  * The repository to download prebuilt `cargo-sweep` artifacts from.
@@ -72434,7 +72446,6 @@ const fs = __nccwpck_require__(3292);
 const shared = __nccwpck_require__(1590);
 
 async function main() {    
-    const useCache = core.getBooleanInput("use-cache", { required: false });
     const cacheHit = core.getState("cache-hit");
 
     // Recreate `sweep.timestamp` file.
@@ -72448,7 +72459,7 @@ async function main() {
     core.info("Sweeping unused build files.");
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
 
-    if (useCache && cacheHit === "false") {
+    if (shared.INPUTS.useCache && cacheHit === "false") {
         core.info(`Saving cache with key ${shared.cacheKey()}`);
 
         cache.saveCache(

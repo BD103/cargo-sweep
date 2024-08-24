@@ -8,7 +8,6 @@ const fs = require("fs/promises");
 const shared = require("./index");
 
 async function main() {    
-    const useCache = core.getBooleanInput("use-cache", { required: false });
     const cacheHit = core.getState("cache-hit");
 
     // Recreate `sweep.timestamp` file.
@@ -22,7 +21,7 @@ async function main() {
     core.info("Sweeping unused build files.");
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
 
-    if (useCache && cacheHit === "false") {
+    if (shared.INPUTS.useCache && cacheHit === "false") {
         core.info(`Saving cache with key ${shared.cacheKey()}`);
 
         cache.saveCache(
