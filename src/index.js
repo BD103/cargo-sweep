@@ -17,9 +17,9 @@ export const CARGO_SWEEP_VERSION = "^0.7.0";
  * The values of the inputs specified in `action.yml`.
  */
 export const INPUTS = {
-    ghToken: core.getInput("gh-token", { required: false }),
-    usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
     useCache: core.getBooleanInput("use-cache", { required: true }),
+    usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
+    ghToken: core.getInput("gh-token", { required: false }),
 };
 
 /**

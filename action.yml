@@ -2,18 +2,6 @@ name: cargo-sweep
 author: BD103
 description: Sweep away unused Cargo files from the `target` directory.
 inputs:
-  gh-token:
-    description: |
-      The Github token used to fetch the most recent artifact. This defaults to
-      `github.token`, but is only required if `use-prebuilt` is true.
-    required: false
-    default: ${{ github.token }}
-  use-prebuilt:
-    description: |
-      If true, the action will download a prebuilt binary of `cargo-sweep` instead of installing it
-      using `cargo install`. By default this is false.
-    required: false
-    default: false
   use-cache:
     description: |
       If true, the action will save `cargo-sweep` to the Github Actions cache and restore it
@@ -21,6 +9,18 @@ inputs:
       `use-prebuilt` is false, but has little effect when it is true. By default this is true.
     required: false
     default: true
+  use-prebuilt:
+    description: |
+      If true, the action will download a prebuilt binary of `cargo-sweep` instead of installing it
+      using `cargo install`. By default this is false.
+    required: false
+    default: false
+  gh-token:
+    description: |
+      The Github token used to fetch the most recent artifact. This defaults to
+      `github.token`, but is only required if `use-prebuilt` is true.
+    required: false
+    default: ${{ github.token }}
 runs:
   using: node20
   main: dist/main/index.js
