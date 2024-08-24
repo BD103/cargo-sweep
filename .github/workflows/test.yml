@@ -11,12 +11,13 @@ on:
 
 jobs:
   test:
-    name: Test action
+    name: 'Test action (${{ matrix.os }}, prebuilt: ${{ matrix.prebuilt }}, cache: ${{ matrix.cache }})'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         prebuilt: [true, false]
+        cache: [true, false]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -38,6 +39,7 @@ jobs:
         uses: ./
         with:
           use-prebuilt: ${{ matrix.prebuilt }}
+          use-cache: ${{ matrix.cache }}
 
       - name: Check Rust project
         run: cargo check
