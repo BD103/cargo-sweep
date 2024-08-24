@@ -28,10 +28,6 @@ async function main() {
             shared.cacheKey(),
         )
     }
-
-    // Remove `cargo-sweep` file so it is not cached by anything else.
-    core.info("Removing `cargo-sweep`.");
-    await io.rmRF(shared.PATH);
 }
 
 try {

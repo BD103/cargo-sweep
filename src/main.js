@@ -35,7 +35,6 @@ async function downloadCargoSweep() {
     const artifactId = data.artifacts[0].id;
     const workflowRunId = data.artifacts[0].workflow_run.id;
 
-    
     // Download artifact.
     core.info(`Downloading artifact ${artifactId} from workflow run ${workflowRunId} to ${shared.PARENT_PATH}`);
     const client = new artifact.DefaultArtifactClient();
