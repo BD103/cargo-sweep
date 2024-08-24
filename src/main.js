@@ -70,17 +70,25 @@ async function main() {
 
     if (useCache) {
         core.startGroup("Restoring `cargo-sweep` from cache.");
+
         cacheSuccess = await cache.restoreCache(
             [shared.PATH],
             shared.cacheKey(),
         );
+
+        if (cacheSuccess === undefined) {
+            core.saveState("cache-hit", "false");
+            core.info(`No cache was found for key ${shared.cacheKey()}`);
+        } else {
+            core.saveState("cache-hit", "true");
+            core.info(`Hit cache ${cacheSuccess}.`);
+        }
+
         core.endGroup();
     }
 
     // If no cache was found or caching is disabled.
     if (cacheSuccess === undefined) {
-        core.saveState("cache-hit", "false");
-
         if (usePrebuilt) {
             core.startGroup("Downloading pre-built `cargo-sweep`.");
             await downloadCargoSweep();
@@ -90,8 +98,6 @@ async function main() {
         }
 
         core.endGroup();
-    } else {
-        core.saveState("cache-hit", "true");
     }
 
     // Create timestamp.

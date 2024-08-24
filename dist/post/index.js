@@ -72449,6 +72449,8 @@ async function main() {
     await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
 
     if (useCache && cacheHit === "false") {
+        core.info(`Saving cache with key ${shared.cacheKey()}`);
+
         cache.saveCache(
             [shared.PATH],
             shared.cacheKey(),
