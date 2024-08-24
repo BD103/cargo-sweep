@@ -76,12 +76,12 @@ async function main() {
 
         cacheSuccess = await cache.restoreCache(
             [shared.PATH],
-            shared.cacheKey(),
+            shared.CACHE_KEY,
         );
 
         if (cacheSuccess === undefined) {
             core.saveState("cache-hit", "false");
-            core.info(`No cache was found for key ${shared.cacheKey()}`);
+            core.info(`No cache was found for key ${shared.CACHE_KEY}`);
         } else {
             core.saveState("cache-hit", "true");
             core.info(`Hit cache ${cacheSuccess}.`);
