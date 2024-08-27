@@ -14,7 +14,14 @@ This is most useful if you cache the `target` directory and use `restore-keys` t
 
 # Make sure to restore your cache before calling `cargo-sweep`.
 - name: Cache build files
-  uses: Leafwing-Studios/cargo-cache@v2
+  uses: actions/cache@v4
+  with:
+    # You probably want to cache more files and use a more-detailed key. This is kept short for
+    # brevity's sake.
+    path: target
+    key: my-job-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+    # `cargo-sweep` is only useful if you use restore keys.
+    restore-keys: my-job-${{ runner.os }}-
 
 - name: Sweep cache for stale files
   uses: BD103/cargo-sweep@v1
@@ -23,6 +30,8 @@ This is most useful if you cache the `target` directory and use `restore-keys` t
 # discarded.
 - run: cargo build
 ```
+
+For an all-in-one caching and sweeping solution, I highly recommend [Leafwing-Studios/cargo-cache](https://github.com/Leafwing-Studios/cargo-cache), which integrates with this action directly! Set `sweep-cache: true`.
 
 ## Caching
 
