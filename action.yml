@@ -15,6 +15,12 @@ inputs:
       using `cargo install`. By default this is false.
     required: false
     default: false
+  project-path:
+    description: |
+      The path to the folder containing `Cargo.toml` and `target`, without a trailing slash. By
+      default this is the current working directory.
+    required: false
+    default: '.'
   gh-token:
     description: |
       The Github token used to fetch the most recent artifact. This defaults to

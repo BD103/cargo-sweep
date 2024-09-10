@@ -61418,6 +61418,7 @@ const CARGO_SWEEP_VERSION = "^0.7.0";
 const INPUTS = {
     useCache: core.getBooleanInput("use-cache", { required: true }),
     usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
+    projectPath: core.getInput("project-path", { required: true }),
     ghToken: core.getInput("gh-token", { required: false }),
 };
 
@@ -72439,25 +72440,34 @@ var __webpack_exports__ = {};
 const cache = __nccwpck_require__(6878);
 const core = __nccwpck_require__(9093);
 const exec = __nccwpck_require__(7775);
-const io = __nccwpck_require__(2826);
 
 const fs = __nccwpck_require__(3292);
 
 const shared = __nccwpck_require__(1590);
 
-async function main() {    
+async function main() {
+    try {
+        // Check if the `target` folder exists.
+        fs.access(`${shared.INPUTS.projectPath}/target`);
+    } catch {
+        core.info(`Cargo \`target\` directory was not found at ${shared.INPUTS.projectPath}/target.`);
+
+        // Since there's nothing to cache, let's exit early.
+        return;
+    }
+
     const cacheHit = core.getState("cache-hit");
 
     // Recreate `sweep.timestamp` file.
     core.info("Restoring timestamp from state.");
     const timestamp = core.getState("timestamp");
-    await fs.writeFile("sweep.timestamp", timestamp);
+    await fs.writeFile(`${shared.INPUTS.projectPath}/sweep.timestamp`, timestamp);
 
     core.info(`Using timestamp: ${timestamp}.`);
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused build files.");
-    await exec.exec(`"${shared.PATH}"`, ["sweep", "--file"]);
+    await exec.exec(`"${shared.PATH}"`, ["sweep", "--file", shared.INPUTS.projectPath]);
 
     if (shared.INPUTS.useCache && cacheHit === "false") {
         core.info(`Saving cache with key ${shared.cacheKey()}`);
@@ -72465,7 +72475,7 @@ async function main() {
         cache.saveCache(
             [shared.PATH],
             shared.cacheKey(),
-        )
+        );
     }
 }
 

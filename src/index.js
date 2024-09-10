@@ -19,6 +19,7 @@ export const CARGO_SWEEP_VERSION = "^0.7.0";
 export const INPUTS = {
     useCache: core.getBooleanInput("use-cache", { required: true }),
     usePrebuilt: core.getBooleanInput("use-prebuilt", { required: true }),
+    projectPath: core.getInput("project-path", { required: true }),
     ghToken: core.getInput("gh-token", { required: false }),
 };
 
