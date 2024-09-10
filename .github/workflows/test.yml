@@ -33,6 +33,7 @@ jobs:
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
         with:
+          manifest-path: ${{ matrix.project-path }}/Cargo.toml
           cargo-target-dir: ${{ matrix.project-path }}/target
           # Disable `cargo-cache`'s `cargo-sweep` integration.
           sweep-cache: false
