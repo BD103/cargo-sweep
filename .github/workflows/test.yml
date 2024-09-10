@@ -18,6 +18,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         prebuilt: [true, false]
         cache: [true, false]
+        project-path: ['.', subdir]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -27,21 +28,28 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Initialize Rust project
-        run: cargo init --bin
+        run: cargo init --bin ${{ matrix.project-path }}
 
       - name: Cache build files
-        uses: Leafwing-Studios/cargo-cache@v2      
+        uses: Leafwing-Studios/cargo-cache@v2
+        with:
+          cargo-target-dir: ${{ matrix.project-path }}/target
+          # Disable `cargo-cache`'s `cargo-sweep` integration.
+          sweep-cache: false
 
       - name: Build Rust project
+        working-directory: ${{ matrix.project-path }}
         run: cargo build
 
       - name: cargo-sweep
         uses: ./
         with:
-          use-prebuilt: ${{ matrix.prebuilt }}
           use-cache: ${{ matrix.cache }}
+          use-prebuilt: ${{ matrix.prebuilt }}
+          project-path: ${{ matrix.project-path }}
 
       - name: Check Rust project
+        working-directory: ${{ matrix.project-path }}
         run: cargo check
 
       # `cargo-sweep` should delete all build files, but keep the check ones.
