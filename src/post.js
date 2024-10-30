@@ -5,6 +5,16 @@ const fs = require("fs/promises");
 const path = require("path");
 const stream = require("stream");
 
+// A list of files, relative to the `target` directory, that will never be deleted. For more
+// information on the `target` folder's file structure, please see
+// <https://doc.rust-lang.org/nightly/nightly-rustc/cargo/core/compiler/layout/index.html>.
+const SKIPPED_FILES = [
+    // There will only ever be one copy of these files, and they will often be recreated by `cargo`
+    // after they are deleted.
+    "CACHEDIR.TAG",
+    ".rustc_info.json",
+];
+
 /**
  * Returns the path to the `target` directory of the current Cargo project.
  *
@@ -53,8 +63,9 @@ async function main() {
         const stat = await fs.stat(filePath);
 
         // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
-        // amount of space.
-        if (stat.isDirectory()) {
+        // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
+        // sense to delete them.
+        if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
             continue;
         }
 
