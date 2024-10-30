@@ -27598,6 +27598,8 @@ async function locateTarget(manifestPath) {
     // Destroy the stream, just in case it wasn't done so already.
     outStream.destroy();
 
+    core.debug(`Executing \`cargo locate-project\` resulted in the following \`stdout\`: ${lines}`);
+
     // From the path to `Cargo.toml`, return the path to `target`.
     return path.join(lines[1], "../", "target");
 }
@@ -27622,13 +27624,21 @@ async function main() {
         // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
         // sense to delete them.
         if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
+            core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
             continue;
         }
 
         // If the file's last access time is older than the timestamp, delete it.
         if (stat.atime.getTime() < stamp) {
-            core.info(`Deleting ${filePath}.`);
+            if (core.isDebug()) {
+                core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
+            } else {
+                core.info(`Deleting ${filePath}.`);
+            }
+
             await fs.rm(filePath);
+        } else {
+            core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
         }
     }
 }
