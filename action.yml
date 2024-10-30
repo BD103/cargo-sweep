@@ -2,31 +2,12 @@ name: cargo-sweep
 author: BD103
 description: Sweep away unused Cargo files from the `target` directory.
 inputs:
-  use-cache:
-    description: |
-      If true, the action will save `cargo-sweep` to the Github Actions cache and restore it
-      instead of compiling / downloading it again. This can greatly speed up this action when
-      `use-prebuilt` is false, but has little effect when it is true. By default this is true.
-    required: false
-    default: true
-  use-prebuilt:
-    description: |
-      If true, the action will download a prebuilt binary of `cargo-sweep` instead of installing it
-      using `cargo install`. By default this is false.
-    required: false
-    default: false
   project-path:
     description: |
       The path to the folder containing `Cargo.toml` and `target`, without a trailing slash. By
       default this is the current working directory.
     required: false
     default: '.'
-  gh-token:
-    description: |
-      The Github token used to fetch the most recent artifact. This defaults to
-      `github.token`, but is only required if `use-prebuilt` is true.
-    required: false
-    default: ${{ github.token }}
 runs:
   using: node20
   main: dist/main/index.js
