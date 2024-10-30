@@ -43,6 +43,10 @@ async function main() {
         const filePath = path.join(targetPath, file);
         const stat = await fs.stat(filePath);
 
+        if (!stat.isFile()) {
+            continue;
+        }
+
         if (stat.atime.getTime() < stamp) {
             core.info(`Deleting ${filePath}.`);
             await fs.rm(filePath);
