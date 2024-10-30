@@ -54,7 +54,7 @@ async function locateTarget(manifestPath) {
 }
 
 async function main() {
-    const stamp = core.getState("timestamp");
+    const stamp = Number(core.getState("timestamp"));
     core.info(`Using timestamp: ${new Date(stamp)}.`);
 
     const manifestPath = core.getInput("manifest-path", { required: true });
