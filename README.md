@@ -16,6 +16,7 @@ This is most useful if you cache the `target` directory and use `restore-keys` t
 ## Quickstart
 
 ```yml
+# Rust (and Cargo) must be installed in order to use `cargo-sweep`.
 - name: Install Rust
   uses: dtolnay/rust-toolchain@stable
 
@@ -41,3 +42,14 @@ This is most useful if you cache the `target` directory and use `restore-keys` t
 > [!TIP]
 >
 > For an all-in-one caching and sweeping solution, I highly recommend [Leafwing-Studios/cargo-cache](https://github.com/Leafwing-Studios/cargo-cache), which integrates with this action directly!
+
+## Inputs
+
+```yml
+- name: Sweep cache for stale files
+  uses: BD103/cargo-sweep@v2
+  with:
+    # The path to `Cargo.toml`, used to discover the Cargo workspace and `target` directory. By
+    # default this is the `Cargo.toml` in the current working directory.
+    manifest-path: Cargo.toml
+```
