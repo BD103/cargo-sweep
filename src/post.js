@@ -6,9 +6,14 @@ const path = require("path");
 const stream = require("stream");
 
 /**
+ * Returns the path to the `target` directory of the current Cargo project.
+ *
  * @returns {string}
  */
 async function locateTarget() {
+    // An array of strings, where each string is a line outputted by `cargo locate-project`. Note
+    // that `exec.exec()` doesn't guarantee that each written string will be a line (separated by
+    // `\n`), so this should be considered a hack and may break in the future.
     const lines = [];
 
     const outStream = new stream.Writable({
@@ -18,20 +23,23 @@ async function locateTarget() {
         }
     });
 
+    // Locate the absolute path to `Cargo.toml`.
     await exec.exec(
         "cargo locate-project",
         ["--workspace", "--message-format=plain", "--color=never"],
         { outStream },
     );
 
+    // Destroy the stream, just in case it wasn't done so already.
     outStream.destroy();
 
+    // From the path to `Cargo.toml`, return the path to `target`.
     return path.join(lines[1], "../", "target");
 }
 
 async function main() {
     const stamp = core.getState("timestamp");
-    core.info(`Using timestamp: ${stamp}.`);
+    core.info(`Using timestamp: ${new Date(stamp)}.`);
 
     // Remove everything older than timestamp.
     core.info("Sweeping unused files.");
@@ -39,14 +47,18 @@ async function main() {
     // Find `target` folder.
     const targetPath = await locateTarget();
 
+    // Iterate recursively over all files in `target`.
     for (const file of await fs.readdir(targetPath, { recursive: true })) {
         const filePath = path.join(targetPath, file);
         const stat = await fs.stat(filePath);
 
-        if (!stat.isFile()) {
+        // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
+        // amount of space.
+        if (stat.isDirectory()) {
             continue;
         }
 
+        // If the file's last access time is older than the timestamp, delete it.
         if (stat.atime.getTime() < stamp) {
             core.info(`Deleting ${filePath}.`);
             await fs.rm(filePath);
