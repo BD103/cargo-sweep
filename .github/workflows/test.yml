@@ -29,12 +29,10 @@ jobs:
         run: cargo init --bin
 
       - name: Cache build files
-        uses: Leafwing-Studios/cargo-cache@v2
+        uses: actions/cache@v4
         with:
-          manifest-path: Cargo.toml
-          cargo-target-dir: target
-          # Disable `cargo-cache`'s `cargo-sweep` integration.
-          sweep-cache: false
+          key: ${{ runner.os }}-${{ hashFiles('**/Cargo.toml') }}
+          path: target
 
       - name: Build Rust project
         # working-directory: ${{ matrix.project-path }}
