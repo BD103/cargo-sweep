@@ -11,12 +11,12 @@ on:
 
 jobs:
   test:
-    name: 'Test action (${{ matrix.os }})'
+    name: 'Test action (${{ matrix.os }}, ${{ matrix.project-path }})'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        # project-path: ['.', subdir]
+        project-path: ['.', subdir]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -26,25 +26,19 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Initialize Rust project
-        run: cargo init --bin
-
-      - name: Cache build files
-        uses: actions/cache@v4
-        with:
-          key: ${{ runner.os }}-${{ hashFiles('**/Cargo.toml') }}
-          path: target
+        run: cargo init --bin --vcs=none ${{ matrix.project-path }}
 
       - name: Build Rust project
-        # working-directory: ${{ matrix.project-path }}
+        working-directory: ${{ matrix.project-path }}
         run: cargo build
 
       - name: cargo-sweep
         uses: ./
-        # with:
-        #   project-path: ${{ matrix.project-path }}
+        with:
+          manifest-path: ${{ matrix.project-path }}/Cargo.toml
 
       - name: Check Rust project
-        # working-directory: ${{ matrix.project-path }}
+        working-directory: ${{ matrix.project-path }}
         run: cargo check
 
       # `cargo-sweep` should delete all build files, but keep the check ones.

@@ -2,12 +2,12 @@ name: cargo-sweep
 author: BD103
 description: Sweep away unused Cargo files from the `target` directory.
 inputs:
-  project-path:
+  manifest-path:
     description: |
-      The path to the folder containing `Cargo.toml` and `target`, without a trailing slash. By
-      default this is the current working directory.
-    required: false
-    default: '.'
+      The path to `Cargo.toml`, used to discover the Cargo workspace and `target` directory. By
+      default this is the `Cargo.toml` in the current working directory.
+    required: true
+    default: 'Cargo.toml'
 runs:
   using: node20
   main: dist/main/index.js

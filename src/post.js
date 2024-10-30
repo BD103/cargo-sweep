@@ -18,9 +18,10 @@ const SKIPPED_FILES = [
 /**
  * Returns the path to the `target` directory of the current Cargo project.
  *
+ * @param {string} manifestPath;
  * @returns {string}
  */
-async function locateTarget() {
+async function locateTarget(manifestPath) {
     // An array of strings, where each string is a line outputted by `cargo locate-project`. Note
     // that `exec.exec()` doesn't guarantee that each written string will be a line (separated by
     // `\n`), so this should be considered a hack and may break in the future.
@@ -36,7 +37,12 @@ async function locateTarget() {
     // Locate the absolute path to `Cargo.toml`.
     await exec.exec(
         "cargo locate-project",
-        ["--workspace", "--message-format=plain", "--color=never"],
+        [
+            `--manifest-path=${manifestPath}`,
+            "--workspace",
+            "--message-format=plain",
+            "--color=never",
+        ],
         { outStream },
     );
 
@@ -51,11 +57,12 @@ async function main() {
     const stamp = core.getState("timestamp");
     core.info(`Using timestamp: ${new Date(stamp)}.`);
 
-    // Remove everything older than timestamp.
-    core.info("Sweeping unused files.");
+    const manifestPath = core.getInput("manifest-path", { required: true });
+    core.info(`Locating \`target\` folder from ${manifestPath}.`);
 
     // Find `target` folder.
-    const targetPath = await locateTarget();
+    const targetPath = await locateTarget(manifestPath);
+    core.info(`Sweeping files from ${targetPath}.`);
 
     // Iterate recursively over all files in `target`.
     for (const file of await fs.readdir(targetPath, { recursive: true })) {
