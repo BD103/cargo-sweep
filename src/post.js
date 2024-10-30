@@ -1,42 +1,52 @@
-const cache = require("@actions/cache");
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 
 const fs = require("fs/promises");
+const path = require("path");
+const stream = require("stream");
 
-const shared = require("./index");
+/**
+ * @returns {string}
+ */
+async function locateTarget() {
+    const lines = [];
+
+    const outStream = new stream.Writable({
+        write(chunk, _encoding, callback) {
+            lines.push(chunk.toString("utf-8"));
+            callback();
+        }
+    });
+
+    await exec.exec(
+        "cargo locate-project",
+        ["--workspace", "--message-format=plain", "--color=never"],
+        { outStream },
+    );
+
+    outStream.destroy();
+
+    return path.join(lines[1], "../", "target");
+}
 
 async function main() {
-    try {
-        // Check if the `target` folder exists.
-        fs.access(`${shared.INPUTS.projectPath}/target`);
-    } catch {
-        core.info(`Cargo \`target\` directory was not found at ${shared.INPUTS.projectPath}/target.`);
-
-        // Since there's nothing to cache, let's exit early.
-        return;
-    }
-
-    const cacheHit = core.getState("cache-hit");
-
-    // Recreate `sweep.timestamp` file.
-    core.info("Restoring timestamp from state.");
-    const timestamp = core.getState("timestamp");
-    await fs.writeFile(`${shared.INPUTS.projectPath}/sweep.timestamp`, timestamp);
-
-    core.info(`Using timestamp: ${timestamp}.`);
+    const stamp = core.getState("timestamp");
+    core.info(`Using timestamp: ${stamp}.`);
 
     // Remove everything older than timestamp.
-    core.info("Sweeping unused build files.");
-    await exec.exec(`"${shared.PATH}"`, ["sweep", "--file", shared.INPUTS.projectPath]);
+    core.info("Sweeping unused files.");
 
-    if (shared.INPUTS.useCache && cacheHit === "false") {
-        core.info(`Saving cache with key ${shared.cacheKey()}`);
+    // Find `target` folder.
+    const targetPath = await locateTarget();
 
-        cache.saveCache(
-            [shared.PATH],
-            shared.cacheKey(),
-        );
+    for (const file of await fs.readdir(targetPath, { recursive: true })) {
+        const filePath = path.join(targetPath, file);
+        const stat = await fs.stat(filePath);
+
+        if (stat.atime.getTime() < stamp) {
+            core.info(`Deleting ${filePath}.`);
+            await fs.rm(filePath);
+        }
     }
 }
 
