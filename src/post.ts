@@ -66,6 +66,7 @@ async function main() {
     const targetPath = await locateTarget(manifestPath);
     core.info(`Sweeping files from ${targetPath}.`);
 
+    // An array of promises that will be awaited on all at once.
     const operationHandles: Promise<void>[] = [];
 
     // Iterate recursively over all files in `target`.
