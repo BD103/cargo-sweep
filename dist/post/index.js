@@ -25707,14 +25707,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 1943:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");
-
-/***/ }),
-
 /***/ 8611:
 /***/ ((module) => {
 
@@ -27547,12 +27539,34 @@ module.exports = parseParams
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-const core = __nccwpck_require__(4708);
-const exec = __nccwpck_require__(9365);
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
 
-const fs = __nccwpck_require__(1943);
-const path = __nccwpck_require__(6928);
-const stream = __nccwpck_require__(2203);
+// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+core@1.11.1/node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(4708);
+// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+exec@1.1.1/node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(9365);
+;// CONCATENATED MODULE: external "fs/promises"
+const promises_namespaceObject = require("fs/promises");
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(6928);
+// EXTERNAL MODULE: external "stream"
+var external_stream_ = __nccwpck_require__(2203);
+;// CONCATENATED MODULE: ./src/post.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
 
 // A list of files, relative to the `target` directory, that will never be deleted. For more
 // information on the `target` folder's file structure, please see
@@ -27563,97 +27577,89 @@ const SKIPPED_FILES = [
     "CACHEDIR.TAG",
     ".rustc_info.json",
 ];
-
 /**
  * Returns the path to the `target` directory of the current Cargo project.
  *
  * @param {string} manifestPath;
  * @returns {string}
  */
-async function locateTarget(manifestPath) {
-    // An array of strings, where each string is a line outputted by `cargo locate-project`. Note
-    // that `exec.exec()` doesn't guarantee that each written string will be a line (separated by
-    // `\n`), so this should be considered a hack and may break in the future.
-    const lines = [];
-
-    const outStream = new stream.Writable({
-        write(chunk, _encoding, callback) {
-            lines.push(chunk.toString("utf-8"));
-            callback();
-        }
-    });
-
-    // Locate the absolute path to `Cargo.toml`.
-    await exec.exec(
-        "cargo locate-project",
-        [
+function locateTarget(manifestPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // An array of strings, where each string is a line outputted by `cargo locate-project`. Note
+        // that `exec.exec()` doesn't guarantee that each written string will be a line (separated by
+        // `\n`), so this should be considered a hack and may break in the future.
+        const lines = [];
+        const outStream = new external_stream_.Writable({
+            write(chunk, _encoding, callback) {
+                lines.push(chunk.toString("utf-8"));
+                callback();
+            }
+        });
+        // Locate the absolute path to `Cargo.toml`.
+        yield exec.exec("cargo locate-project", [
             `--manifest-path=${manifestPath}`,
             "--workspace",
             "--message-format=plain",
             "--color=never",
-        ],
-        { outStream },
-    );
-
-    // Destroy the stream, just in case it wasn't done so already.
-    outStream.destroy();
-
-    core.debug(`Executing \`cargo locate-project\` resulted in the following \`stdout\`: ${lines}`);
-
-    // From the path to `Cargo.toml`, return the path to `target`.
-    return path.join(lines[1], "../", "target");
+        ], { outStream });
+        // Destroy the stream, just in case it wasn't done so already.
+        outStream.destroy();
+        core.debug(`Executing \`cargo locate-project\` resulted in the following \`stdout\`: ${lines}`);
+        // From the path to `Cargo.toml`, return the path to `target`.
+        return external_path_.join(lines[1], "../", "target");
+    });
 }
-
-async function main() {
-    const stamp = Number(core.getState("timestamp"));
-    core.info(`Using timestamp: ${new Date(stamp)}.`);
-
-    const manifestPath = core.getInput("manifest-path", { required: true });
-    core.info(`Locating \`target\` folder from ${manifestPath}.`);
-
-    // Find `target` folder.
-    const targetPath = await locateTarget(manifestPath);
-    core.info(`Sweeping files from ${targetPath}.`);
-
-    // Iterate recursively over all files in `target`.
-    for (const file of await fs.readdir(targetPath, { recursive: true })) {
-        const filePath = path.join(targetPath, file);
-        const stat = await fs.stat(filePath);
-
-        // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
-        // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
-        // sense to delete them.
-        if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
-            core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
-            continue;
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const stamp = Number(core.getState("timestamp"));
+        core.info(`Using timestamp: ${new Date(stamp)}.`);
+        const manifestPath = core.getInput("manifest-path", { required: true });
+        core.info(`Locating \`target\` folder from ${manifestPath}.`);
+        // Find `target` folder.
+        const targetPath = yield locateTarget(manifestPath);
+        core.info(`Sweeping files from ${targetPath}.`);
+        const operationHandles = [];
+        // Iterate recursively over all files in `target`.
+        for (const file of yield promises_namespaceObject.readdir(targetPath, { recursive: true })) {
+            const filePath = external_path_.join(targetPath, file);
+            operationHandles.push(promises_namespaceObject.stat(filePath).then((stat) => __awaiter(this, void 0, void 0, function* () {
+                // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
+                // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
+                // sense to delete them.
+                if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
+                    core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
+                    return;
+                }
+                // If the file's last access time is older than the timestamp, delete it.
+                if (stat.atime.getTime() < stamp) {
+                    if (core.isDebug()) {
+                        core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
+                    }
+                    else {
+                        core.info(`Deleting ${filePath}.`);
+                    }
+                    yield promises_namespaceObject.rm(filePath);
+                }
+                else {
+                    core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
+                }
+            })));
         }
-
-        // If the file's last access time is older than the timestamp, delete it.
-        if (stat.atime.getTime() < stamp) {
-            if (core.isDebug()) {
-                core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
-            } else {
-                core.info(`Deleting ${filePath}.`);
-            }
-
-            await fs.rm(filePath);
-        } else {
-            core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
-        }
-    }
+        yield Promise.all(operationHandles);
+    });
 }
-
 try {
     const failed = core.getState("failed");
-
     if (failed == "true") {
         throw new Error("Main action failed, skipping post action.");
     }
-
     main();
-} catch (err) {
+}
+catch (err) {
     core.setFailed(`Action failed with error: ${err}`);
 }
+
+})();
 
 module.exports = __webpack_exports__;
 /******/ })()
