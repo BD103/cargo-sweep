@@ -27533,36 +27533,90 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-const core = __nccwpck_require__(4708);
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(4708);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
-async function main() {
-    // Find the current time since the UNIX epoch.
-    const stamp = Date.now();
-
-    core.info(`Creating timestamp at ${new Date(stamp)}.`);
-    core.info("All files in the `target` folder not accessed between now and the end of the run will be purged.")
-
-    // Save the timestamp so that it can be accessed in the post step.
-    core.saveState("timestamp", stamp);
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Find the current time since the UNIX epoch.
+        const stamp = Date.now();
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Creating timestamp at ${new Date(stamp)}.`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("All files in the `target` folder not accessed between now and the end of the run will be purged.");
+        // Save the timestamp so that it can be accessed in the post step.
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.saveState("timestamp", stamp);
+    });
 }
-
 try {
     main();
-
-    core.saveState("failed", "false");
-} catch (err) {
-    core.setFailed(`Action failed with error: ${err}`);
-
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.saveState("failed", "false");
+}
+catch (err) {
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Action failed with error: ${err}`);
     // The post action will, by default, always run. This signals that an error occurred and it
     // should not proceed.
-    core.saveState("failed", "true");
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.saveState("failed", "true");
 }
+
+})();
 
 module.exports = __webpack_exports__;
 /******/ })()

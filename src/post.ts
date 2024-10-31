@@ -1,9 +1,9 @@
-const core = require("@actions/core");
-const exec = require("@actions/exec");
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 
-const fs = require("fs/promises");
-const path = require("path");
-const stream = require("stream");
+import * as fs from "fs/promises";
+import * as path from "path";
+import * as stream from "stream";
 
 // A list of files, relative to the `target` directory, that will never be deleted. For more
 // information on the `target` folder's file structure, please see
@@ -21,14 +21,14 @@ const SKIPPED_FILES = [
  * @param {string} manifestPath;
  * @returns {string}
  */
-async function locateTarget(manifestPath) {
+async function locateTarget(manifestPath: string): Promise<string> {
     // An array of strings, where each string is a line outputted by `cargo locate-project`. Note
     // that `exec.exec()` doesn't guarantee that each written string will be a line (separated by
     // `\n`), so this should be considered a hack and may break in the future.
-    const lines = [];
+    const lines: string[] = [];
 
     const outStream = new stream.Writable({
-        write(chunk, _encoding, callback) {
+        write(chunk: Buffer, _encoding, callback) {
             lines.push(chunk.toString("utf-8"));
             callback();
         }
@@ -66,32 +66,39 @@ async function main() {
     const targetPath = await locateTarget(manifestPath);
     core.info(`Sweeping files from ${targetPath}.`);
 
+    // An array of promises that will be awaited on all at once.
+    const operationHandles: Promise<void>[] = [];
+
     // Iterate recursively over all files in `target`.
     for (const file of await fs.readdir(targetPath, { recursive: true })) {
         const filePath = path.join(targetPath, file);
-        const stat = await fs.stat(filePath);
 
-        // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
-        // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
-        // sense to delete them.
-        if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
-            core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
-            continue;
-        }
+        operationHandles.push(
+            fs.stat(filePath).then(async (stat) => {
+                // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
+                // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
+                // sense to delete them.
+                if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
+                    core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
+                    return;
+                }
 
-        // If the file's last access time is older than the timestamp, delete it.
-        if (stat.atime.getTime() < stamp) {
-            if (core.isDebug()) {
-                core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
-            } else {
-                core.info(`Deleting ${filePath}.`);
-            }
+                // If the file's last access time is older than the timestamp, delete it.
+                if (stat.atime.getTime() < stamp) {
+                    if (core.isDebug()) {
+                        core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
+                    } else {
+                        core.info(`Deleting ${filePath}.`);
+                    }
 
-            await fs.rm(filePath);
-        } else {
-            core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
-        }
+                    await fs.rm(filePath);
+                } else {
+                    core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
+                }
+            }));
     }
+
+    await Promise.all(operationHandles);
 }
 
 try {
