@@ -72,8 +72,10 @@ jobs:
           if [[ $(git status --porcelain) ]]; then
             echo '::error title=Rebuilt Javascript bundles and found a different output.::Did you run `pnpm build`?'
 
-            git status
-            git diff
+            # Force colorful output for these commands, since a human and not a machine is meant to
+            # read them.
+            git -c color.ui=always status
+            git -c color.ui=always diff
 
             exit 1
           else
