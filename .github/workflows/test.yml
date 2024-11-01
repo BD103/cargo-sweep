@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: 'Test action (${{ matrix.os }}, ${{ matrix.project-path }})'
+    name: Test action (${{ matrix.os }}, ${{ matrix.project-path }})
     strategy:
       fail-fast: false
       matrix:
@@ -42,3 +42,42 @@ jobs:
         run: cargo check
 
       # `cargo-sweep` should delete all build files, but keep the check ones.
+
+  ncc:
+    name: Verify `ncc` output is up-to-date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ^9.7.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Error if files have changed
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            echo '::error title=Rebuilt Javascript bundles and found a different output.::Did you run `pnpm build`?'
+
+            # Force colorful output for these commands, since a human and not a machine is meant to
+            # read them.
+            git -c color.ui=always status
+            git -c color.ui=always diff
+
+            exit 1
+          else
+            echo Rebuilt Javascript bundles match.
+          fi
