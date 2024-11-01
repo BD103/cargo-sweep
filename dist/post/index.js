@@ -27644,7 +27644,7 @@ function main() {
         // Find `target` folder.
         const targetPath = yield locateTarget(manifestPath);
         core.info(`Sweeping files from ${targetPath}.`);
-        // An array of promises that will be awaited on all at once. These promi9ses return the size of
+        // An array of promises that will be awaited on all at once. These promises return the size of
         // the file that they deleted.
         const operationHandles = [];
         // Iterate recursively over all files in `target`.
