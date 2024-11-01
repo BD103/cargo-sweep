@@ -17,9 +17,6 @@ const SKIPPED_FILES = [
 
 /**
  * Returns the path to the `target` directory of the current Cargo project.
- *
- * @param {string} manifestPath;
- * @returns {string}
  */
 async function locateTarget(manifestPath: string): Promise<string> {
     // An array of strings, where each string is a line outputted by `cargo locate-project`. Note

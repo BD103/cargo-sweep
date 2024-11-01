@@ -7,7 +7,7 @@ inputs:
       The path to `Cargo.toml`, used to discover the Cargo workspace and `target` directory. By
       default this is the `Cargo.toml` in the current working directory.
     required: true
-    default: 'Cargo.toml'
+    default: Cargo.toml
 runs:
   using: node20
   main: dist/main/index.js
