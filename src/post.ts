@@ -140,9 +140,7 @@ async function main() {
     const bytesDeleted = (await Promise.all(operationHandles))
         .reduce((acc, size) => acc + size, 0);
 
-    core.notice(`${bytesToHuman(bytesDeleted)} of unused build artifacts have been cleaned.`, {
-        title: "`cargo-sweep` Results",
-    });
+    core.info(`${bytesToHuman(bytesDeleted)} of unused build artifacts have been cleaned.`);
 }
 
 try {

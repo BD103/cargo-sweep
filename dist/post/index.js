@@ -27678,9 +27678,7 @@ function main() {
         // Await all operations, then sum their returned sizes.
         const bytesDeleted = (yield Promise.all(operationHandles))
             .reduce((acc, size) => acc + size, 0);
-        core.notice(`${bytesToHuman(bytesDeleted)} of unused build artifacts have been cleaned.`, {
-            title: "`cargo-sweep` Results",
-        });
+        core.info(`${bytesToHuman(bytesDeleted)} of unused build artifacts have been cleaned.`);
     });
 }
 try {
