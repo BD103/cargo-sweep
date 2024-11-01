@@ -54,7 +54,6 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: ^9.7.1
-          run_install: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -67,3 +66,16 @@ jobs:
 
       - name: Build project
         run: pnpm build
+
+      - name: Error if files have changed
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            echo '::error title=Rebuilt Javascript bundles and found a different output.::Did you run `pnpm build`?'
+
+            git status
+            git diff
+
+            exit 1
+          else
+            echo Rebuilt Javascript bundles match.
+          fi
