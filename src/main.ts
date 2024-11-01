@@ -4,6 +4,8 @@ async function main() {
     // Find the current time since the UNIX epoch.
     const stamp: number = Date.now();
 
+    Oh no!
+
     core.info(`Creating timestamp at ${new Date(stamp)}.`);
     core.info("All files in the `target` folder not accessed between now and the end of the run will be purged.")
 
