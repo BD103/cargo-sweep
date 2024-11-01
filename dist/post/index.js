@@ -27579,9 +27579,6 @@ const SKIPPED_FILES = [
 ];
 /**
  * Returns the path to the `target` directory of the current Cargo project.
- *
- * @param {string} manifestPath;
- * @returns {string}
  */
 function locateTarget(manifestPath) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -27609,6 +27606,35 @@ function locateTarget(manifestPath) {
         return external_path_.join(lines[1], "../", "target");
     });
 }
+/**
+ * Returns a human-readable version of `bytes`. (Such as "2 MiB", "1.3 KiB", etc.)
+ *
+ * This implementation is based off of the answer in <https://stackoverflow.com/a/14919494>. Thank
+ * you!
+ */
+function bytesToHuman(bytes) {
+    // Each incrementing unit is 2^10 above the last
+    const thresh = 1024;
+    // Available units above bytes. The `target` folder should realistically never reach the size
+    // of a TiB or greater.
+    const units = ["KiB", "MiB", "GiB"];
+    // The amount of decimal points that will be outputted.
+    const decimalPrecision = 1;
+    // 10^decimalPrecision, used when mathematically rounding a number to a certain decimal place.
+    const pow10 = Math.pow(10, decimalPrecision);
+    // If the number is less than 1 KiB, return it in bytes.
+    if (Math.abs(bytes) < thresh) {
+        return `${bytes} B`;
+    }
+    // An increment that indexes into `units`.
+    let i = -1;
+    // Repeat until `bytes` is below the threshold or there are no more greater units available.
+    do {
+        bytes /= thresh;
+        ++i;
+    } while (Math.round(Math.abs(bytes) * pow10) / pow10 >= thresh && i < units.length - 1);
+    return `${bytes.toFixed(decimalPrecision)} ${units[i]}`;
+}
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const stamp = Number(core.getState("timestamp"));
@@ -27618,6 +27644,8 @@ function main() {
         // Find `target` folder.
         const targetPath = yield locateTarget(manifestPath);
         core.info(`Sweeping files from ${targetPath}.`);
+        // An array of promises that will be awaited on all at once. These promi9ses return the size of
+        // the file that they deleted.
         const operationHandles = [];
         // Iterate recursively over all files in `target`.
         for (const file of yield promises_namespaceObject.readdir(targetPath, { recursive: true })) {
@@ -27628,7 +27656,7 @@ function main() {
                 // sense to delete them.
                 if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
                     core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
-                    return;
+                    return 0;
                 }
                 // If the file's last access time is older than the timestamp, delete it.
                 if (stat.atime.getTime() < stamp) {
@@ -27639,13 +27667,20 @@ function main() {
                         core.info(`Deleting ${filePath}.`);
                     }
                     yield promises_namespaceObject.rm(filePath);
+                    return stat.size;
                 }
                 else {
                     core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
+                    return 0;
                 }
             })));
         }
-        yield Promise.all(operationHandles);
+        // Await all operations, then sum their returned sizes.
+        const bytesDeleted = (yield Promise.all(operationHandles))
+            .reduce((acc, size) => acc + size, 0);
+        core.notice(`${bytesToHuman(bytesDeleted)} of unused build artifacts have been cleaned.`, {
+            title: "`cargo-sweep` Results",
+        });
     });
 }
 try {
