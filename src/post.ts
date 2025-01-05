@@ -109,31 +109,43 @@ async function main() {
         const filePath = path.join(targetPath, file);
 
         operationHandles.push(
-            fs.stat(filePath).then(async (stat) => {
-                // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
-                // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
-                // sense to delete them.
-                if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
-                    core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
-                    return 0;
-                }
-
-                // If the file's last access time is older than the timestamp, delete it.
-                if (stat.atime.getTime() < stamp) {
-                    if (core.isDebug()) {
-                        core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
-                    } else {
-                        core.info(`Deleting ${filePath}.`);
+            fs.stat(filePath).then(
+                // `onFulfilled`, executed when `fs.stat()` succeeds.
+                async (stat) => {
+                    // Skip over folders, since they cannot be deleted with `fs.rm()` and take up a minimal
+                    // amount of space. Additionally, skip certain whitelisted files where it wouldn't make
+                    // sense to delete them.
+                    if (stat.isDirectory() || SKIPPED_FILES.includes(file)) {
+                        core.debug(`Skipped ${filePath} because it is a directory or is whitelisted.`);
+                        return 0;
                     }
 
-                    await fs.rm(filePath);
+                    // If the file's last access time is older than the timestamp, delete it.
+                    if (stat.atime.getTime() < stamp) {
+                        if (core.isDebug()) {
+                            core.info(`Deleting ${filePath} with \`atime\` of ${stat.atime}.`);
+                        } else {
+                            core.info(`Deleting ${filePath}.`);
+                        }
 
-                    return stat.size;
-                } else {
-                    core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
+                        await fs.rm(filePath);
+
+                        return stat.size;
+                    } else {
+                        core.debug(`Skipped ${filePath} because it was accessed after timestamp.`);
+                        return 0;
+                    }
+                },
+                // `onRejected`, called when `fs.stat()` fails. This is usually due to a bug in
+                // NodeJS where `fs.stat()` fails with a permission denied error on Windows.
+                // (https://github.com/nodejs/node/issues/35853)
+                (error) => {
+                    core.info(`Skipped ${filePath} because \`fs.stat()\` failed.`);
+                    core.debug(error);
+
                     return 0;
-                }
-            }));
+                },
+            ));
     }
 
     // Await all operations, then sum their returned sizes.
