@@ -98,6 +98,14 @@ async function main() {
 
     // Find `target` folder.
     const targetPath = await locateTarget(manifestPath);
+
+    try {
+        await fs.access(targetPath);
+    } catch {
+        core.warning(`\`target\` folder ${targetPath} does not exist, exiting without sweeping anything.`);
+        return;
+    }
+
     core.info(`Sweeping files from ${targetPath}.`);
 
     // An array of promises that will be awaited on all at once. These promises return the size of
